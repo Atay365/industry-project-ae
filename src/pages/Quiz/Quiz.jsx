@@ -46,8 +46,8 @@ function Quiz() {
 
     const selected = selectedAnswer[`${category}_${questionIndex}`];
 
-    console.log(`Selected Answer: ${selected}`);
-    console.log(`Correct Answer: ${correctAnswer}`);
+    // console.log(`Selected Answer: ${selected}`);
+    // console.log(`Correct Answer: ${correctAnswer}`);
 
     const isCorrect = selected === correctAnswer;
 
