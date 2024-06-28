@@ -2,6 +2,7 @@ import "./Quiz.scss";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import aeIcon from "../../assets/imgs/ae-icon.png";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -37,7 +38,12 @@ function Quiz() {
   };
 
   const handleSubmit = (category, questionIndex) => {
-    const correctAnswer = quiz[category][questionIndex].answer;
+    const correctAnswer = category.startsWith("scenarioBasedQuestions")
+      ? quiz.scenarioBasedQuestions[parseInt(category.split("_")[1])].questions[
+          questionIndex
+        ].answer
+      : quiz[category][questionIndex].answer;
+
     const selected = selectedAnswer[`${category}_${questionIndex}`];
 
     console.log(`Selected Answer: ${selected}`);
@@ -47,10 +53,12 @@ function Quiz() {
 
     setResult((prev) => ({
       ...prev,
-      [`${category}_${questionIndex}`]: isCorrect ? "Correct" : "Wrong",
+      [`${category}_${questionIndex}`]: isCorrect ? "Correct" : "Try Again",
     }));
 
-    if (!isCorrect) {
+    if (isCorrect) {
+      handleNextQuestion();
+    } else {
       setSelectedAnswer((prev) => ({
         ...prev,
         // Should allow for them to resubmit again if they got it wrong first.
@@ -60,11 +68,13 @@ function Quiz() {
   };
 
   const handleNextQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    if (currentQuestionIndex < allQuestions.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    }
   };
-
   const handlePreviousQuestion = () => {
-    setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+    if (currentQuestionIndex > 0)
+      setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
   };
 
   const getAllQuestions = () => {
@@ -123,106 +133,57 @@ function Quiz() {
     return <div>Loading...</div>;
   }
 
-  // The map function looked wayy too messy inside the return. Setting it to a variable here.
-  //   const renderQuestion = (category, questions) => {
-  //     return questions.map((q, index) => (
-  //       <div key={`${category}_${index}`}>
-  //         <h3>{q.question}</h3>
-  //         {q.options.map((option, optIndex) => (
-  //           <div key={`${category}_${index}_${optIndex}`}>
-  //             <input
-  //               type="radio"
-  //               name={`${category}_${index}`}
-  //               id={`${category}_${index}_${optIndex}`}
-  //               value={option}
-  //               onChange={() => handleAnswerSelect(category, index, option)}
-  //             />
-  //             <label htmlFor={`${category}_${index}_${optIndex}`}>{option}</label>
-  //           </div>
-  //         ))}
-  //         <button onClick={() => handleSubmit(category, index)}>
-  //           Submit Answer
-  //         </button>
-  //         {result[`${category}_${index}`] && (
-  //           <p>{result[`${category}_${index}`]}</p>
-  //         )}
-  //       </div>
-  //     ));
-  //   };
-
-  //   const renderScenarioQuestions = (scenarioIndex, scenario) => {
-  //     return scenario.questions.map((q, index) => (
-  //       <div key={`scenario_${scenarioIndex}_${index}`}>
-  //         <h4>{q.question}</h4>
-  //         {q.options.map((option, optIndex) => (
-  //           <div key={`scenario_${scenarioIndex}_${index}_${optIndex}`}>
-  //             <input
-  //               type="radio"
-  //               id={`scenario_${scenarioIndex}_${index}_${optIndex}`}
-  //               name={`scenario_${scenarioIndex}_${index}`}
-  //               value={option}
-  //               onChange={() =>
-  //                 handleAnswerSelect(`scenario_${scenarioIndex}`, index, option)
-  //               }
-  //             />
-  //             <label htmlFor={`scenario_${scenarioIndex}_${index}_${optIndex}`}>
-  //               {option}
-  //             </label>
-  //           </div>
-  //         ))}
-  //         <button
-  //           onClick={() => handleSubmit(`scenario_${scenarioIndex}`, index)}
-  //         >
-  //           Submit Answer
-  //         </button>
-  //         {result[`scenario_${scenarioIndex}_${index}`] && (
-  //           <p>{result[`scenario_${scenarioIndex}_${index}`]}</p>
-  //         )}
-  //       </div>
-  //     ));
-  //   };
-
-  //   if (
-  //     quiz.generalPhishingQuestions.length === 0 &&
-  //     quiz.generalSecurityQuestions.length === 0 &&
-  //     quiz.scenarioBasedQuestions.length === 0
-  //   ) {
-  //     return <div>Loading...</div>;
-  //   }
-
   return (
     <main>
-      <section>
-        <h2>{formatCategoryName(currentCategoryMapping.category)}</h2>
-        {currentQuestion.scenario && <h3>{currentQuestion.scenario}</h3>}
-        {currentQuestion.description && <p>{currentQuestion.description}</p>}
-        <div>
-          <h3>{currentQuestion.question}</h3>
+      <section className="quiz">
+        <div className="quiz__header">
+          <div className="quiz__head">
+            <button
+              className="quiz__back-button"
+              onClick={handlePreviousQuestion}
+            >
+              {"<"}
+            </button>
+            <h3 className="page__header">QUIZ</h3>
+            <img className="quiz__logo" src={aeIcon} alt="logo" />
+          </div>
+          <div className="quiz__title-container">
+            <h2 className="quiz__title">
+              {formatCategoryName(currentCategoryMapping.category)}
+            </h2>
+            {currentQuestion.scenario && (
+              <h3 className="quiz__question">{currentQuestion.scenario}</h3>
+            )}
+            {currentQuestion.description && (
+              <p className="quiz__description">{currentQuestion.description}</p>
+            )}
+            <h3 className="quiz__question">{currentQuestion.question}</h3>
+          </div>
+        </div>
+        <div className="quiz__question--container">
           {currentQuestion.options.map((option, optIndex) => (
             <div
               key={`${currentCategoryMapping.category}_${currentCategoryMapping.index}_${optIndex}`}
+              className={`option ${
+                selectedAnswer[
+                  `${currentCategoryMapping.category}_${currentCategoryMapping.index}`
+                ] === option
+                  ? "selected"
+                  : ""
+              }`}
+              onClick={() =>
+                handleAnswerSelect(
+                  currentCategoryMapping.category,
+                  currentCategoryMapping.index,
+                  option
+                )
+              }
             >
-              <input
-                type="radio"
-                name={`${currentCategoryMapping.category}_${currentCategoryMapping.index}`}
-                id={`${currentCategoryMapping.category}_${currentCategoryMapping.index}_${optIndex}`}
-                value={option}
-                onChange={() =>
-                  handleAnswerSelect(
-                    currentCategoryMapping.category,
-                    currentCategoryMapping.index,
-                    option
-                  )
-                }
-              />
-              <label
-                htmlFor={`${currentCategoryMapping.category}_${currentCategoryMapping.index}_${optIndex}`}
-              >
-                {option}
-              </label>
+              {option}
             </div>
           ))}
           <button
+            className="quiz__submit-button"
             onClick={() =>
               handleSubmit(
                 currentCategoryMapping.category,
@@ -230,12 +191,12 @@ function Quiz() {
               )
             }
           >
-            Submit Answer
+            Submit
           </button>
           {result[
             `${currentCategoryMapping.category}_${currentCategoryMapping.index}`
           ] && (
-            <p>
+            <p className="quiz__result">
               {
                 result[
                   `${currentCategoryMapping.category}_${currentCategoryMapping.index}`
@@ -244,14 +205,14 @@ function Quiz() {
             </p>
           )}
         </div>
-        <div>
+        {/* <div>
           {currentQuestionIndex > 0 && (
             <button onClick={handlePreviousQuestion}>Previous Question</button>
           )}
           {currentQuestionIndex < allQuestions.length - 1 && (
             <button onClick={handleNextQuestion}>Next Question</button>
           )}
-        </div>
+        </div> */}
       </section>
     </main>
   );

@@ -1,0 +1,48 @@
+@font-face {
+  font-family: Guardian Sans;
+  src: url("/src/assets/fonts/GuardianSansRegular.otf");
+  font-style: normal;
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: Guardian Sans;
+  src: url("/src/assets/fonts/GuardianSansThin.otf");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Guardian Sans;
+  src: url("/src/assets/fonts/GuardianSansBold.otf");
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: Monterrat;
+  src: url("/src/assets/fonts/Montserrat-Regular.ttf");
+  font-style: normal;
+  font-weight: 200;
+}
+@font-face {
+  font-family: Monterrat;
+  src: url("/src/assets/fonts/Montserrat-Medium.ttf");
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-family: Monterrat;
+  src: url("/src/assets/fonts/Montserrat-SemiBold.ttf");
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: Monterrat;
+  src: url("/src/assets/fonts/Montserrat-Light.ttf");
+  font-style: normal;
+  font-weight: 100;
+}
+
+$site-main-font: "Guardian Sans", "Arial";
+$site-secondary-font: "Monterrat";
+$line-height: 1.375rem;
